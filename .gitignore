@@ -13,5 +13,15 @@ __pycache__/
 .env.*
 !.env.example
 
+# Original case-study files and generated data artifacts
+/data/raw/
+/outputs/
+*.duckdb
+*.duckdb.wal
+
+# Local Databricks authentication and deployment state
+.databricks/
+.databrickscfg
+
 # Operating system files
 .DS_Store

@@ -1,4 +1,69 @@
-# eurowings_holiday_booking_flight_forecast
+# Eurowings Holidays: booking-to-flight forecast reconciliation
+
+Data science case study connecting booking-date and flight-date forecasts for
+ticket volume (`Tix`) and revenue in euros, separately for each destination
+market (`FlightMarketCluster`).
+
+## Objective
+
+Produce a table with `BookingDate`, `FlightDate`, `FlightMarketCluster`, `Tix`
+and `Revenue`. Aggregating the result by either booking date or flight date,
+within each market, must reproduce the corresponding supplied forecast for
+both measures. The solution must preserve plausible booking lead times,
+account for bookings and flights in different years, and retain the original
+forecast average order values (`Revenue / Tix`).
+
+The submission will explain the method, validation, error metrics and
+limitations, and demonstrate repeatable execution and access for BI users.
+
+## Current status
+
+- Poetry, the Jupyter kernel, Ruff, pre-commit and GitHub Actions are configured.
+- The supplied brief and three CSVs have been inspected. Their inventory is in
+  [data/sources.csv](data/sources.csv).
+- The original CSVs are stored in the Databricks managed volume
+  `/Volumes/workspace/default/ewh_source_data/`.
+- The three raw Delta tables are loaded in `workspace.ewh_dev`. The
+  [SQL guide](sql/README.md) explains loading and validation.
+- Analysis notebooks, modelling and deployment jobs are not yet implemented.
+  There are no model results or accuracy claims yet.
+
+## Repository layout
+
+```text
+.
+├── README.md
+├── pyproject.toml
+├── poetry.lock
+├── .gitignore
+├── .pre-commit-config.yaml
+├── .github/workflows/ci.yml
+├── data/
+│   ├── README.md          # Source descriptions, storage and verification
+│   ├── sources.csv        # File inventory and SHA-256 checksums
+│   └── raw/               # Original CSVs and brief; excluded from Git
+└── sql/
+    ├── README.md          # Execution instructions and validation expectations
+    ├── 01_ingest_raw.sql  # Repeatable DEV raw-table loading
+    └── 02_validate_raw.sql
+```
+
+Start with the [data guide](data/README.md) for file schemas, date coverage and
+source verification. Further folders will be added alongside their working
+implementations.
+
+## Reproduce the current setup
+
+1. Obtain the supplied case-study files through an authorised channel and place
+   them in `data/raw/`, preserving the filenames in `data/sources.csv`.
+   Original files are not distributed with this repository.
+2. Verify their checksums using the instructions in [data/README.md](data/README.md).
+3. Install the locked environment and register the kernel as described below.
+4. Run the local project checks.
+5. In Databricks, run the loading and validation scripts following the
+   [SQL guide](sql/README.md). This requires authorised access to the source
+   volume and a SQL warehouse. Local CI does not execute these cloud statements.
+   A modelling workflow will be documented when implemented and validated.
 
 ## Environment
 
@@ -92,6 +157,6 @@ Forecasting tests, time-based split checks and data validation should be added
 alongside the corresponding code. A green CI result currently validates the
 project setup and code checks, not forecast accuracy.
 
-Commit `pyproject.toml`, `poetry.lock`, `.pre-commit-config.yaml`, `.gitignore`,
-this README and `.github/workflows/ci.yml`. `poetry.toml` remains local.
-The workflow starts running after these changes are committed and pushed.
+`poetry.toml` remains machine-local. Original source files, generated data and
+Databricks authentication files are excluded from Git. Keep credentials outside
+the repository; the data guide documents storage paths without credentials.
