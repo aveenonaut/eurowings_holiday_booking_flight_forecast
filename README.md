@@ -25,8 +25,16 @@ limitations, and demonstrate repeatable execution and access for BI users.
   `/Volumes/workspace/default/ewh_source_data/`.
 - The three raw Delta tables are loaded in `workspace.ewh_dev`. The
   [SQL guide](sql/README.md) explains loading and validation.
-- Analysis notebooks, modelling and deployment jobs are not yet implemented.
-  There are no model results or accuracy claims yet.
+- The [research review](docs/literature_review.md) covers 16 relevant papers,
+  with reading depth and limitations recorded for each.
+- The [executed analysis notebook](notebooks/01_data_analysis.ipynb) reads the raw
+  SQL tables. Start with [the findings](reports/findings.md) for its results and
+  [analysis decisions](docs/decisions.md) for assumptions and open questions.
+  The [anomaly interpretation](docs/anomaly_interpretation.md) separates observed
+  patterns from possible causes and records the limits of external evidence.
+- No forecasting model or deployment job is implemented. The on-books/forecast
+  conflicts and missing-key interpretation need resolution before modelling.
+  There are no forecast accuracy claims yet.
 
 ## Repository layout
 
@@ -42,10 +50,26 @@ limitations, and demonstrate repeatable execution and access for BI users.
 │   ├── README.md          # Source descriptions, storage and verification
 │   ├── sources.csv        # File inventory and SHA-256 checksums
 │   └── raw/               # Original CSVs and brief; excluded from Git
-└── sql/
-    ├── README.md          # Execution instructions and validation expectations
-    ├── 01_ingest_raw.sql  # Repeatable DEV raw-table loading
-    └── 02_validate_raw.sql
+├── sql/
+│   ├── README.md          # Execution instructions and validation expectations
+│   ├── 01_ingest_raw.sql  # Repeatable DEV raw-table loading
+│   ├── 02_validate_raw.sql
+│   └── 03_analysis_extract.sql
+├── notebooks/
+│   ├── README.md          # Connection and execution instructions
+│   └── 01_data_analysis.ipynb
+├── src/ewh_forecast/
+│   └── data_access.py     # Complete SQL result fetching via authenticated CLI
+├── tests/
+│   └── test_data_access.py
+├── docs/
+│   ├── literature_review.md
+│   ├── anomaly_interpretation.md
+│   └── decisions.md
+├── reports/
+│   ├── findings.md
+│   └── figures/           # Selected exported charts
+└── outputs/               # Generated local summaries; excluded from Git
 ```
 
 Start with the [data guide](data/README.md) for file schemas, date coverage and
@@ -63,6 +87,9 @@ implementations.
 5. In Databricks, run the loading and validation scripts following the
    [SQL guide](sql/README.md). This requires authorised access to the source
    volume and a SQL warehouse. Local CI does not execute these cloud statements.
+6. Run [the analysis notebook](notebooks/README.md). It makes read-only SQL
+   queries and writes local figures and summary outputs. Review the findings
+   before interpreting partial flight cohorts or choosing modelling assumptions.
    A modelling workflow will be documented when implemented and validated.
 
 ## Environment
@@ -89,6 +116,7 @@ poetry run python -m ipykernel install --user \
 ```bash
 poetry run pre-commit run --all-files
 poetry run python -m pip check
+PYTHONPATH=src poetry run python -m unittest discover -s tests -v
 ```
 
 Pre-commit checks Git-tracked files; newly created code is included after it is
@@ -118,6 +146,7 @@ their open pull request, avoiding duplicate push/PR runs. It:
 4. Runs the same pre-commit checks used locally: Poetry/lock-file validation;
    YAML, TOML and JSON validation; whitespace and merge-conflict checks; secret
    detection; and Ruff linting and formatting for Python files and notebooks.
+5. Tests SQL result handling with mocked responses, without connecting to Databricks.
 
 ### What checks each requirement
 
@@ -152,10 +181,11 @@ hashes. There is no baseline silently accepting existing findings. Review false
 positives before adding a narrow `pragma: allowlist secret` annotation. Detection
 is heuristic and cannot guarantee that every secret will be found.
 
-The repository does not yet contain forecasting code or application tests.
-Forecasting tests, time-based split checks and data validation should be added
-alongside the corresponding code. A green CI result currently validates the
-project setup and code checks, not forecast accuracy.
+Tests cover full result pagination, exact decimal amounts, truncated/missing
+results and SQL failures. Forecasting tests and time-based split checks should
+be added alongside modelling code. A green CI result validates project checks
+and tested utilities, not forecast accuracy. SQL source validation and the
+analysis notebook require authenticated Databricks access and are run separately.
 
 `poetry.toml` remains machine-local. Original source files, generated data and
 Databricks authentication files are excluded from Git. Keep credentials outside
