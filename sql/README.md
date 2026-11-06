@@ -7,6 +7,7 @@ development schema, `workspace.ewh_dev`. They do not create or modify PROD table
 | --- | --- |
 | `01_ingest_raw.sql` | Create the DEV schema and tables, then load each source with `COPY INTO` |
 | `02_validate_raw.sql` | Check counts, required fields, key uniqueness, totals and full source equality |
+| `03_analysis_extract.sql` | Read the three DEV raw tables for the analysis notebook without modifying them |
 
 ## Run the scripts
 
