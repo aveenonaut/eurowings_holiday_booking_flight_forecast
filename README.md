@@ -43,8 +43,9 @@ poetry run ruff format .
 
 ## Continuous integration
 
-GitHub Actions runs **CI / Environment and code checks** on pushes, pull requests
-and manual runs. It:
+GitHub Actions runs **CI / Environment and code checks** on pull requests targeting
+`main`, pushes to `main`, and manual runs. Feature-branch pushes are checked through
+their open pull request, avoiding duplicate push/PR runs. It:
 
 1. Sets up Python 3.10.18 and Poetry 2.1.4.
 2. Installs dependencies from the committed `poetry.lock`, including development tools.
