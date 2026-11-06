@@ -1,0 +1,75 @@
+repos:
+  - repo: local
+    hooks:
+      - id: poetry-check
+        name: Validate Poetry project and lock file
+        entry: poetry check --lock
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: check-yaml
+        name: Validate YAML
+        entry: poetry run check-yaml
+        language: system
+        types: [yaml]
+
+      - id: check-toml
+        name: Validate TOML
+        entry: poetry run check-toml
+        language: system
+        types: [toml]
+
+      - id: check-json
+        name: Validate JSON and notebook JSON
+        entry: poetry run check-json
+        language: system
+        types_or: [json, jupyter]
+
+      - id: pretty-format-json
+        name: Check JSON formatting
+        entry: poetry run pretty-format-json
+        args: [--no-sort-keys]
+        language: system
+        types: [json]
+        exclude: \.ipynb$
+
+      - id: trailing-whitespace
+        name: Remove trailing whitespace
+        entry: poetry run trailing-whitespace-fixer
+        args: [--markdown-linebreak-ext=md]
+        language: system
+        types: [text]
+
+      - id: end-of-file-fixer
+        name: Ensure a single newline at end of file
+        entry: poetry run end-of-file-fixer
+        language: system
+        types: [text]
+
+      - id: check-merge-conflict
+        name: Detect unresolved merge conflicts
+        entry: poetry run check-merge-conflict
+        args: [--assume-in-merge]
+        language: system
+        types: [text]
+
+      - id: detect-secrets
+        name: Detect secrets
+        entry: poetry run detect-secrets-hook
+        args: [--no-verify]
+        language: system
+        types: [text]
+        exclude: ^poetry\.lock$
+
+      - id: ruff-check
+        name: Lint and modernize Python and notebooks
+        entry: poetry run ruff check
+        language: system
+        types_or: [python, pyi, jupyter]
+
+      - id: ruff-format
+        name: Check Python and notebook formatting
+        entry: poetry run ruff format --check
+        language: system
+        types_or: [python, pyi, jupyter]

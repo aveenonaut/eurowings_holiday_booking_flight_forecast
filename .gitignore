@@ -1,0 +1,17 @@
+# Local environments, caches and notebook checkpoints
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.ruff_cache/
+.pytest_cache/
+
+# Machine-local Poetry settings and environment variables
+/poetry.toml
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
